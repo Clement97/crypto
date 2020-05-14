@@ -15,6 +15,13 @@ def DecodeVigenere(cyphertext, key):
 def CodeVigenere(plaintext, key):
     return code_vigenere(plaintext, key)
 
+def PGCD (m,n) :
+    if m <= 0 or n <= 0 : raise Exception("impossible de calculer le PGCD")
+    if m == 1 or n == 1 : return 1
+    if m == n : return m
+    if m < n : return PGCD (m, n-m)
+    return PGCD (n, m-n)
 
-code_vigenere('TEST','CLE')
-code_vigenere('VPWV','CLE',True)
+
+# code_vigenere('TEST','CLE')
+# code_vigenere('VPWV','CLE',True)
