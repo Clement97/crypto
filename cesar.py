@@ -68,36 +68,52 @@ def CodeCesar(plaintext, key):
 ###############Analyse fréquentielle#####################
 
 def decryptbyFA(cyphertext):
-    french = {'a' : 9.42,'b' : 1.02,'c' : 2.64,'d' : 3.39,'e' : 15.87,'f' : 0.95,'g' : 1.04,'h' : 0.77,'i' : 8.41,'j' : 0.89,'k' : 0.00,'l' : 5.34,'m' : 3.24,'n' : 7.15,'o' : 5.14,'p' : 2.86,'q' : 1.06,'r' : 6.46,'s' : 7.90,'t' : 7.26,'u' : 6.24,'v' : 2.15,'w' : 0.00,'x' : 0.30,'y' : 0.24,'z' : 0.32}
+    french = {'A' : 9.42,'B' : 1.02,'C' : 2.64,'D' : 3.39,'E' : 15.87,'F' : 0.95,'G' : 1.04,'H' : 0.77,'I' : 8.41,'J' : 0.89,'K' : 0.00,'L' : 5.34,'M' : 3.24,'N' : 7.15,'O' : 5.14,'P' : 2.86,'Q' : 1.06,'R' : 6.46,'S' : 7.90,'T' : 7.26,'U' : 6.24,'V' : 2.15,'W' : 0.00,'X' : 0.30,'Y' : 0.24,'Z' : 0.32}
 
     text = cyphertext
 
     freq = french.copy()
 
+    print(freq)
     for key in freq:
         freq[key] = 0.00
 
-    for char in text.replace(' ', ''):
+    for char in cyphertext:
         freq[char] = frequence(char, text)
 
     freq = OrderedDict(sorted(freq.items(), key=lambda t: t[1], reverse=True))
 
+    print(freq)
     for key in freq:
         print (key + ' -> ' + str(freq.get(key) * 100))
 
     frenchSorted = OrderedDict(sorted(french.items(), key=lambda t: t[1], reverse=True))
 
-
-    for key in freq:
-        if freq.get(key) != 0.00:
+    possibleKeys = []
+    for i,key in enumerate(freq):
+        if(i<3):
             maxKey = getMaxValueKey(french)
-            del french[maxKey]
-            print('Key => ' + key + ', maxKey => ' + maxKey)
-            text = text.replace(key, maxKey)
+            possibleKeys.append( ((26+ord(key)-65) -ord(maxKey)-65)%26)
 
-    print(text)
-    return text
+    indexKey = -1
+    errorMin = 99999999999
+    for possibleKey in possibleKeys:
+        plainfreq = {}
+        for i,key in enumerate(freq):
+            plainfreq[chr((ord(key)-65+possibleKey)%26+65)]=freq[key]
+        errorCompute = compare_dict(frenchSorted,plainfreq)
+        if(errorMin>errorCompute):
+            errorMin = errorCompute
+            indexKey = possibleKeys.index(possibleKey)
 
+    code_cesar(cyphertext,possibleKeys[indexKey])
+
+
+def compare_dict(dic1,dic2):
+    sum = 0
+    for i,key in enumerate(dic1):
+        sum += (dic1[key]-dic2[key])**2
+    return sum
 def getMaxValueKey(dic):
     v=list(dic.values())
     k=list(dic.keys())
@@ -106,7 +122,7 @@ def getMaxValueKey(dic):
 def frequence(letter, text):            
     return text.count(letter) / len(text)
 
-def test():
+def testFA():
     text = open("input.txt", "r")
     message = text.read()
     message = message.replace ("\n", "").replace ("\r", "").replace ("\t", "").replace (" ", "").replace (",", "")
@@ -124,4 +140,4 @@ def test():
 
 # decrypt('uftu',1)
 
-test()
+testFA()
